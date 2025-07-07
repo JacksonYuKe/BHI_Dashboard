@@ -87,7 +87,7 @@ const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
             <p className="label">{`Hour ${data.hour}:00`}</p>
             <p className="consumption">{`Consumption: ${data.consumption.toFixed(2)} kWh`}</p>
             <p className="baseline">{`Baseline: ${weeklyData.baseline.toFixed(2)} kWh`}</p>
-            <p className="threshold">{`Threshold: ${weeklyData.threshold.toFixed(2)} kWh`}</p>
+            <p className="threshold">{`Threshold: ${(weeklyData.baseline + weeklyData.threshold).toFixed(2)} kWh`}</p>
             {isInSequence && (
               <p className="exceeds" style={{ color: 'red', fontWeight: 'bold' }}>
                 ⚠️ Part of consecutive sequence exceeding threshold
@@ -130,7 +130,7 @@ const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
             />
             
             <ReferenceLine 
-              y={weeklyData.threshold} 
+              y={weeklyData.baseline + weeklyData.threshold} 
               stroke="red" 
               strokeDasharray="5 5" 
               label="Threshold"
@@ -184,7 +184,7 @@ const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
             Baseline: {weeklyData.baseline.toFixed(2)} kWh/hour
           </span>
           <span className="threshold-info">
-            Threshold: {weeklyData.threshold.toFixed(2)} kWh/hour
+            Threshold: {(weeklyData.baseline + weeklyData.threshold).toFixed(2)} kWh/hour
           </span>
         </div>
       </div>
