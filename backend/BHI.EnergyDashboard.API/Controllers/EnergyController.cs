@@ -16,11 +16,11 @@ namespace BHI.EnergyDashboard.API.Controllers
         }
 
         [HttpGet("locations")]
-        public async Task<ActionResult<List<LocationInfo>>> GetLocations()
+        public async Task<ActionResult<List<LocationInfo>>> GetLocations([FromQuery] double threshold = 2.0)
         {
             try
             {
-                var locations = await _dataService.GetLocationsAsync();
+                var locations = await _dataService.GetLocationsAsync(threshold);
                 return Ok(locations);
             }
             catch (Exception ex)
@@ -46,11 +46,12 @@ namespace BHI.EnergyDashboard.API.Controllers
         [HttpGet("locations/{locationId}/consumption")]
         public async Task<ActionResult<WeeklyConsumption>> GetWeeklyConsumption(
             string locationId, 
-            [FromQuery] DateTime weekStart)
+            [FromQuery] DateTime weekStart,
+            [FromQuery] double threshold = 2.0)
         {
             try
             {
-                var consumption = await _dataService.GetWeeklyConsumptionAsync(locationId, weekStart);
+                var consumption = await _dataService.GetWeeklyConsumptionAsync(locationId, weekStart, threshold);
                 
                 if (consumption == null)
                 {

@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { LocationInfo, WeeklyConsumption } from '../types';
 import { energyApi } from '../services/api';
 import LocationSelector from './LocationSelector';
 import WeekSelector from './WeekSelector';
 import EnergyChart from './EnergyChart';
 
-const Dashboard: React.FC = () => {
-  const [locations, setLocations] = useState<LocationInfo[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<string>('');
-  const [availableWeeks, setAvailableWeeks] = useState<string[]>([]);
-  const [selectedWeek, setSelectedWeek] = useState<string>('');
-  const [weeklyData, setWeeklyData] = useState<WeeklyConsumption | null>(null);
+const Dashboard = ({ threshold, onThresholdChange }) => {
+  const [locations, setLocations] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [availableWeeks, setAvailableWeeks] = useState([]);
+  const [selectedWeek, setSelectedWeek] = useState('');
+  const [weeklyData, setWeeklyData] = useState(null);
   const [loading, setLoading] = useState({
     locations: false,
     weeks: false,
     consumption: false
   });
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadLocations();
-  }, []);
+  }, [threshold]);
 
   useEffect(() => {
     if (selectedLocation) {
@@ -34,13 +33,13 @@ const Dashboard: React.FC = () => {
     if (selectedLocation && selectedWeek) {
       loadWeeklyConsumption(selectedLocation, selectedWeek);
     }
-  }, [selectedLocation, selectedWeek]);
+  }, [selectedLocation, selectedWeek, threshold]);
 
   const loadLocations = async () => {
     try {
       setLoading(prev => ({ ...prev, locations: true }));
       setError(null);
-      const data = await energyApi.getLocations();
+      const data = await energyApi.getLocations(threshold);
       setLocations(data);
     } catch (err) {
       setError('Failed to load locations. Please check if the backend server is running.');
@@ -50,7 +49,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const loadAvailableWeeks = async (locationId: string) => {
+  const loadAvailableWeeks = async (locationId) => {
     try {
       setLoading(prev => ({ ...prev, weeks: true }));
       setError(null);
@@ -64,11 +63,11 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const loadWeeklyConsumption = async (locationId: string, weekStart: string) => {
+  const loadWeeklyConsumption = async (locationId, weekStart) => {
     try {
       setLoading(prev => ({ ...prev, consumption: true }));
       setError(null);
-      const data = await energyApi.getWeeklyConsumption(locationId, weekStart);
+      const data = await energyApi.getWeeklyConsumption(locationId, weekStart, threshold);
       setWeeklyData(data);
     } catch (err) {
       setError('Failed to load consumption data.');
@@ -78,12 +77,19 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleLocationChange = (locationId: string) => {
+  const handleLocationChange = (locationId) => {
     setSelectedLocation(locationId);
   };
 
-  const handleWeekChange = (week: string) => {
+  const handleWeekChange = (week) => {
     setSelectedWeek(week);
+  };
+
+  const handleThresholdChange = (e) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value) && value >= 0.5 && value <= 10) {
+      onThresholdChange(value);
+    }
   };
 
   return (
@@ -101,6 +107,28 @@ const Dashboard: React.FC = () => {
       )}
 
       <div className="dashboard-controls">
+        <div className="threshold-control">
+          <label htmlFor="threshold-input">
+            Threshold (kWh): 
+            <input
+              id="threshold-input"
+              type="number"
+              value={threshold}
+              onChange={handleThresholdChange}
+              min="0.5"
+              max="10"
+              step="0.5"
+              className="threshold-input"
+            />
+          </label>
+          <button 
+            onClick={() => onThresholdChange(2.0)}
+            className="reset-threshold-btn"
+          >
+            Reset to Default
+          </button>
+        </div>
+
         <LocationSelector
           locations={locations}
           selectedLocation={selectedLocation}

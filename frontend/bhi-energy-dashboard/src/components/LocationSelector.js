@@ -1,14 +1,6 @@
 import React from 'react';
-import { LocationInfo } from '../types';
 
-interface LocationSelectorProps {
-  locations: LocationInfo[];
-  selectedLocation: string;
-  onLocationChange: (locationId: string) => void;
-  loading: boolean;
-}
-
-const LocationSelector: React.FC<LocationSelectorProps> = ({
+const LocationSelector = ({
   locations,
   selectedLocation,
   onLocationChange,

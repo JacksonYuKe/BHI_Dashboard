@@ -20,9 +20,11 @@ builder.Services.AddCors(options =>
 });
 
 // Add custom services
-builder.Services.AddSingleton<IDataService, DataService>();
 builder.Services.AddScoped<IChargerPredictionService, ChargerPredictionService>();
 builder.Services.AddScoped<IConsumptionAnalysisService, ConsumptionAnalysisService>();
+builder.Services.AddSingleton<IDataService, DataService>();
+builder.Services.AddScoped<ITransformerDataService, TransformerDataService>();
+builder.Services.AddScoped<ITransformerAnalysisService, TransformerAnalysisService>();
 
 var app = builder.Build();
 

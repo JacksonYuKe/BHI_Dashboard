@@ -1,19 +1,12 @@
 import React from 'react';
 
-interface WeekSelectorProps {
-  availableWeeks: string[];
-  selectedWeek: string;
-  onWeekChange: (week: string) => void;
-  loading: boolean;
-}
-
-const WeekSelector: React.FC<WeekSelectorProps> = ({
-  availableWeeks,
+const WeekSelector = ({
+  availableWeeks = [],
   selectedWeek,
   onWeekChange,
-  loading
+  loading = false
 }) => {
-  const formatWeekDisplay = (weekStart: string) => {
+  const formatWeekDisplay = (weekStart) => {
     const date = new Date(weekStart);
     const endDate = new Date(date);
     endDate.setDate(date.getDate() + 6);
@@ -26,7 +19,7 @@ const WeekSelector: React.FC<WeekSelectorProps> = ({
       <label htmlFor="week-select">Select Week:</label>
       <select
         id="week-select"
-        value={selectedWeek}
+        value={selectedWeek || ''}
         onChange={(e) => onWeekChange(e.target.value)}
         disabled={loading || availableWeeks.length === 0}
         className="select-input"

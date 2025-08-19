@@ -86,7 +86,7 @@ namespace BHI.EnergyDashboard.API.Services
             return records;
         }
 
-        public async Task<List<LocationInfo>> GetLocationsAsync()
+        public async Task<List<LocationInfo>> GetLocationsAsync(double threshold = 2.0)
         {
             var allData = await LoadAllDataAsync();
             var locationGroups = allData.GroupBy(x => x.Location);
@@ -108,7 +108,7 @@ namespace BHI.EnergyDashboard.API.Services
 
                 if (!hasConfirmedChargers)
                 {
-                    var prediction = await _chargerPredictionService.PredictChargerPresenceAsync(locationData);
+                    var prediction = await _chargerPredictionService.PredictChargerPresenceAsync(locationData, threshold);
                     locationInfo.HasPredictedChargers = prediction.HasChargers;
                     locationInfo.ChargerPredictionProbability = prediction.Probability;
                 }
@@ -122,7 +122,7 @@ namespace BHI.EnergyDashboard.API.Services
             return locations;
         }
 
-        public async Task<WeeklyConsumption?> GetWeeklyConsumptionAsync(string locationId, DateTime weekStart)
+        public async Task<WeeklyConsumption?> GetWeeklyConsumptionAsync(string locationId, DateTime weekStart, double threshold = 2.0)
         {
             var allData = await LoadAllDataAsync();
             var locationData = allData.Where(x => x.Location == locationId).ToList();
@@ -137,13 +137,12 @@ namespace BHI.EnergyDashboard.API.Services
                 return null;
 
             var baseline = _consumptionAnalysisService.CalculateBaseline(locationData);
-            var threshold = 2.0;
             var hasConfirmedChargers = locationData.Any(x => x.HasChargers);
             var hasPredictedChargers = false;
 
             if (!hasConfirmedChargers)
             {
-                var prediction = await _chargerPredictionService.PredictChargerPresenceAsync(locationData);
+                var prediction = await _chargerPredictionService.PredictChargerPresenceAsync(locationData, threshold);
                 hasPredictedChargers = prediction.HasChargers;
             }
 

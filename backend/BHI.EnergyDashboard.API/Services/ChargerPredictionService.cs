@@ -11,13 +11,12 @@ namespace BHI.EnergyDashboard.API.Services
             _consumptionAnalysisService = consumptionAnalysisService;
         }
 
-        public async Task<ChargerPrediction> PredictChargerPresenceAsync(List<EnergyConsumption> locationData)
+        public async Task<ChargerPrediction> PredictChargerPresenceAsync(List<EnergyConsumption> locationData, double threshold = 2.0)
         {
             if (!locationData.Any())
                 return new ChargerPrediction { HasChargers = false, Probability = 0 };
 
             var baseline = _consumptionAnalysisService.CalculateBaseline(locationData);
-            var threshold = 2.0;
             var windowSize = 2;
 
             var weeklyData = GroupByWeek(locationData);

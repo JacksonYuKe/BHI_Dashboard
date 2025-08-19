@@ -9,14 +9,8 @@ import {
   ReferenceLine,
   ComposedChart
 } from 'recharts';
-import { WeeklyConsumption } from '../types';
 
-interface EnergyChartProps {
-  weeklyData: WeeklyConsumption | null;
-  loading: boolean;
-}
-
-const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
+const EnergyChart = ({ weeklyData, loading }) => {
   if (loading) {
     return <div className="chart-loading">Loading chart data...</div>;
   }
@@ -26,11 +20,11 @@ const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
   }
 
   // Helper function to find consecutive hours exceeding threshold
-  const findThresholdExceedingSequences = (hourlyData: number[], baseline: number, threshold: number) => {
+  const findThresholdExceedingSequences = (hourlyData, baseline, threshold) => {
     const thresholdValue = baseline + threshold;
-    const sequences: number[][] = [];
+    const sequences = [];
     
-    let currentSequence: number[] = [];
+    let currentSequence = [];
     
     for (let i = 0; i < hourlyData.length; i++) {
       if (hourlyData[i] > thresholdValue) {
@@ -53,13 +47,13 @@ const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
   };
 
   // Create individual daily charts
-  const renderDayChart = (dayData: any, dayIndex: number) => {
+  const renderDayChart = (dayData, dayIndex) => {
     const date = new Date(dayData.date);
     const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
     const dateStr = date.toLocaleDateString();
     
     // Create hourly chart data
-    const hourlyChartData = dayData.hourlyConsumption.map((consumption: number, hour: number) => ({
+    const hourlyChartData = dayData.hourlyConsumption.map((consumption, hour) => ({
       hour: hour,
       hourLabel: `${hour}:00`,
       consumption,
@@ -75,7 +69,7 @@ const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
       weeklyData.threshold
     );
 
-    const CustomTooltip = ({ active, payload, label }: any) => {
+    const CustomTooltip = ({ active, payload, label }) => {
       if (active && payload && payload.length) {
         const data = payload[0].payload;
         const isInSequence = exceedingSequences.some(seq => 
@@ -141,7 +135,7 @@ const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
               dataKey="consumption" 
               stroke="#8884d8" 
               strokeWidth={2}
-              dot={(props: any) => {
+              dot={(props) => {
                 const isInSequence = exceedingSequences.some(seq => 
                   seq.includes(props.payload.hour)
                 );
@@ -208,7 +202,7 @@ const EnergyChart: React.FC<EnergyChartProps> = ({ weeklyData, loading }) => {
         </div>
         <div className="legend-item">
           <span className="legend-line" style={{ borderColor: 'red' }}></span>
-          <span>Threshold (Baseline + 2)</span>
+          <span>Threshold (Baseline + {weeklyData.threshold})</span>
         </div>
       </div>
     </div>

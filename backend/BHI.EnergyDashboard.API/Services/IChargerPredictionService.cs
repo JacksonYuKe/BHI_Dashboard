@@ -4,7 +4,7 @@ namespace BHI.EnergyDashboard.API.Services
 {
     public interface IChargerPredictionService
     {
-        Task<ChargerPrediction> PredictChargerPresenceAsync(List<EnergyConsumption> locationData);
+        Task<ChargerPrediction> PredictChargerPresenceAsync(List<EnergyConsumption> locationData, double threshold = 2.0);
     }
 
     public class ChargerPrediction
